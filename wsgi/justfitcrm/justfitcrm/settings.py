@@ -60,7 +60,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-# GETTING-STARTED: change 'justfitcrm' to your project name:
+# GETTING-STARTED: change 'myproject' to your project name:
 ROOT_URLCONF = 'justfitcrm.urls'
 
 TEMPLATES = [
