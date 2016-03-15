@@ -91,7 +91,7 @@ DATABASES = {
         # GETTING-STARTED: change 'db.sqlite3' to your sqlite3 database:
         # 'NAME': os.path.join(DATA_DIR, 'db.sqlite3'),
         'NAME': os.environ['OPENSHIFT_APP_NAME'],
-        'USER': os.environ['OPENSHIFT_MYSQL_DB_USERNAME']
+        'USER': os.environ['OPENSHIFT_MYSQL_DB_USERNAME'],
         'PASSWORD': os.environ['OPENSHIFT_MYSQL_DB_PASSWORD'],
         'HOST': os.environ['OPENSHIFT_MYSQL_DB_HOST'],
         'PORT': os.environ['OPENSHIFT_MYSQL_DB_PORT'],
