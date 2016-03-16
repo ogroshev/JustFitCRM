@@ -14,7 +14,15 @@ DJ_PROJECT_DIR = os.path.dirname(__file__)
 BASE_DIR = os.path.dirname(DJ_PROJECT_DIR)
 WSGI_DIR = os.path.dirname(BASE_DIR)
 REPO_DIR = os.path.dirname(WSGI_DIR)
-DATA_DIR = os.environ.get('OPENSHIFT_DATA_DIR', BASE_DIR)
+
+ON_OPENSHIFT = False
+if 'OPENSHIFT_REPO_DIR' in os.environ:
+    ON_OPENSHIFT = True
+
+if ON_OPENSHIFT:
+    DATA_DIR = os.environ.get('OPENSHIFT_DATA_DIR', BASE_DIR)
+else:
+    DATA_DIR = os.path.join(REPO_DIR, 'libs')
 
 import sys
 sys.path.append(os.path.join(REPO_DIR, 'libs'))
@@ -30,13 +38,14 @@ SECRET_KEY = SECRETS['secret_key']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
-from socket import gethostname
-ALLOWED_HOSTS = [
-    gethostname(), # For internal OpenShift load balancer security purposes.
-    os.environ.get('OPENSHIFT_APP_DNS'), # Dynamically map to the OpenShift gear name.
-    #'example.com', # First DNS alias (set up in the app)
-    #'www.example.com', # Second DNS alias (set up in the app)
-]
+if ON_OPENSHIFT:
+    from socket import gethostname
+    ALLOWED_HOSTS = [
+        gethostname(), # For internal OpenShift load balancer security purposes.
+        os.environ.get('OPENSHIFT_APP_DNS'), # Dynamically map to the OpenShift gear name.
+        #'example.com', # First DNS alias (set up in the app)
+        #'www.example.com', # Second DNS alias (set up in the app)
+    ]
 
 
 # Application definition
@@ -85,18 +94,33 @@ WSGI_APPLICATION = 'justfitcrm.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        # GETTING-STARTED: change 'db.sqlite3' to your sqlite3 database:
-        # 'NAME': os.path.join(DATA_DIR, 'db.sqlite3'),
-        'NAME': os.environ['OPENSHIFT_APP_NAME'],
-        'USER': os.environ['OPENSHIFT_MYSQL_DB_USERNAME'],
-        'PASSWORD': os.environ['OPENSHIFT_MYSQL_DB_PASSWORD'],
-        'HOST': os.environ['OPENSHIFT_MYSQL_DB_HOST'],
-        'PORT': os.environ['OPENSHIFT_MYSQL_DB_PORT'],
+if ON_OPENSHIFT:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            # GETTING-STARTED: change 'db.sqlite3' to your sqlite3 database:
+            # 'NAME': os.path.join(DATA_DIR, 'db.sqlite3'),
+            'NAME': os.environ['OPENSHIFT_APP_NAME'],
+            'USER': os.environ['OPENSHIFT_MYSQL_DB_USERNAME'],
+            'PASSWORD': os.environ['OPENSHIFT_MYSQL_DB_PASSWORD'],
+            'HOST': os.environ['OPENSHIFT_MYSQL_DB_HOST'],
+            'PORT': os.environ['OPENSHIFT_MYSQL_DB_PORT'],
+        }
     }
-}
+else:
+    DEBUG = True
+    TEMPLATE_DEBUG = True
+    ALLOWED_HOSTS = []
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': '',
+            'USER': '',
+            'PASSWORD': '',
+            'HOST': '',
+            'PORT': '',
+        }
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
