@@ -108,19 +108,10 @@ if ON_OPENSHIFT:
         }
     }
 else:
-    DEBUG = True
-    TEMPLATE_DEBUG = True
-    ALLOWED_HOSTS = []
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',
-            'NAME': '',
-            'USER': '',
-            'PASSWORD': '',
-            'HOST': '',
-            'PORT': '',
-        }
-    }
+    try:
+        from .local_settings import *
+    except ImportError:
+        pass
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
@@ -141,3 +132,4 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(WSGI_DIR, 'static')
+
